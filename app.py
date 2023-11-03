@@ -224,6 +224,8 @@ def get_predictions(filename):
         labels = pred[:, -1].int()
         scores = pred[:, -2]
         boxes = pred[:, :-2]
+        original_height = img.shape[0]
+        original_width = img.shape[1]
 
         # Filter predictions with confidence above the threshold
         mask = scores > 0.5
@@ -235,10 +237,14 @@ def get_predictions(filename):
         annotations = []
         for label, score, box in zip(filtered_labels, filtered_scores, filtered_boxes):
             x1, y1, x2, y2 = box.tolist()
+            width = x2 - x1
+            height = y2 - y1
             annotation = {
                 "label": result.names[int(label)],
                 "confidence": float(score),
-                "bbox": [x1, y1, x2, y2]
+                "bbox": [x1, y1, width, height],
+                "original_w": original_width,
+                "original_h": original_height
             }
             annotations.append(annotation)
 
